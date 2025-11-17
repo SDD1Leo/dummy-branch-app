@@ -1,16 +1,18 @@
-from flask import Flask
+from flask import Flask, g
 from .config import Config, configure_logging
+import uuid
 
-def create_app() -> Flask:
+
+def create_app():
     app = Flask(__name__)
     app.config.from_object(Config())
 
-    # --- Safe logging config ---
-    log_level = app.config.get("LOG_LEVEL", "info")
-    configure_logging(log_level)
-    # ---------------------------
+    configure_logging(app.config["LOG_LEVEL"])
 
-    # Lazy imports to avoid circular deps during app init
+    @app.before_request
+    def attach_request_id():
+        g.request_id = str(uuid.uuid4())
+
     from .routes.health import bp as health_bp
     from .routes.loans import bp as loans_bp
     from .routes.stats import bp as stats_bp
