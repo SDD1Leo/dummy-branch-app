@@ -58,7 +58,7 @@ jobs:
       image: ${{ steps.build.outputs.image }}
 
 
-  scan:
+  security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
     needs: build
