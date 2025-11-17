@@ -28,34 +28,34 @@ jobs:
         run: |
           pytest -q || echo "No tests found"
 
-    build:
-      name: 🏗️ Build Docker Image
-      runs-on: ubuntu-latest
-      needs: test
+  build:
+    name: 🏗️ Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test
 
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Log in to GitHub Container Registry
-          if: github.event_name == 'push'
-          uses: docker/login-action@v3
-          with:
-            registry: ghcr.io
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-        - name: Build Docker image
-          id: build
-          run: |
-            REPO_LC=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-            IMAGE="ghcr.io/$REPO_LC/branch-api:${{ github.sha }}"
-            echo "Building $IMAGE"
-            docker build -t $IMAGE .
-            echo "image=$IMAGE" >> $GITHUB_OUTPUT
+      - name: Build Docker image
+        id: build
+        run: |
+          REPO_LC=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/$REPO_LC/branch-api:${{ github.sha }}"
+          echo "Building $IMAGE"
+          docker build -t $IMAGE .
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
-      outputs:
-        image: ${{ steps.build.outputs.image }}
+    outputs:
+      image: ${{ steps.build.outputs.image }}
 
 
   security-scan:
